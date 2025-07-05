@@ -8,6 +8,7 @@ let score = 0;
 let lastPaintTime = 0;
 let snakeArr = [{x: 13, y: 15}];
 let food = {x: 6, y: 7};
+let gameRunning = false;
 
 function main(ctime) {
     window.requestAnimationFrame(main);
@@ -23,17 +24,21 @@ function isCollide(snake) {
     if(snake[0].x >= 18 || snake[0].x <= 0 || snake[0].y >= 18 || snake[0].y <= 0) return true;
     return false;
 }
-i
+
 function gameEngine() {
     if(isCollide(snakeArr)){
         gameOverSound.play();
         musicSound.pause();
         inputDir = {x: 0, y: 0};
-        alert("Game Over. Press any key or button to play again!");
+        setTimeout(() => {
+            alert("Game Over. Press a key or tap to play again!");
+        }, 100);
         snakeArr = [{x: 13, y: 15}];
         score = 0;
         scoreBox.innerHTML = "Score: " + score;
         musicSound.play();
+        gameRunning = false;
+        return;
     }
 
     if(snakeArr[0].y === food.y && snakeArr[0].x === food.x){
@@ -75,16 +80,21 @@ function gameEngine() {
     board.appendChild(foodElement);
 }
 
+
 musicSound.play();
+
+
 let highscore = localStorage.getItem("highscore");
 let highscoreval = highscore ? JSON.parse(highscore) : 0;
 highscoreBox.innerHTML = "HighScore: " + highscoreval;
 
-window.requestAnimationFrame(main);
 
 window.addEventListener("keydown", e => {
-    inputDir = {x: 0, y: 1};
     moveSound.play();
+    if (!gameRunning) {
+        window.requestAnimationFrame(main);
+        gameRunning = true;
+    }
     switch (e.key) {
         case "ArrowUp": inputDir = {x: 0, y: -1}; break;
         case "ArrowDown": inputDir = {x: 0, y: 1}; break;
@@ -93,8 +103,13 @@ window.addEventListener("keydown", e => {
     }
 });
 
+
 function changeDirection(dir) {
     moveSound.play();
+    if (!gameRunning) {
+        window.requestAnimationFrame(main);
+        gameRunning = true;
+    }
     switch (dir) {
         case "up": inputDir = {x: 0, y: -1}; break;
         case "down": inputDir = {x: 0, y: 1}; break;
